@@ -214,6 +214,13 @@
       "/Users/johnnapier/Turing/mod4/technical_challenges/tea_tracker/app/models/customer.rb": {
         "lines": [
           1,
+          1,
+          null,
+          null,
+          null,
+          null,
+          1,
+          1,
           null
         ]
       },
@@ -223,8 +230,100 @@
           1,
           null
         ]
+      },
+      "/Users/johnnapier/Turing/mod4/technical_challenges/tea_tracker/spec/models/customer_subscription_spec.rb": {
+        "lines": [
+          1,
+          null,
+          1,
+          1,
+          2,
+          2,
+          null,
+          null,
+          1,
+          2,
+          2,
+          null,
+          null
+        ]
+      },
+      "/Users/johnnapier/Turing/mod4/technical_challenges/tea_tracker/app/models/customer_subscription.rb": {
+        "lines": [
+          1,
+          1,
+          1,
+          null,
+          1,
+          null,
+          null
+        ]
+      },
+      "/Users/johnnapier/Turing/mod4/technical_challenges/tea_tracker/spec/models/subscription_spec.rb": {
+        "lines": [
+          1,
+          null,
+          1,
+          1,
+          2,
+          2,
+          null,
+          null,
+          1,
+          2,
+          2,
+          2,
+          2,
+          null,
+          null
+        ]
+      },
+      "/Users/johnnapier/Turing/mod4/technical_challenges/tea_tracker/app/models/subscription.rb": {
+        "lines": [
+          1,
+          1,
+          null,
+          null,
+          null,
+          null,
+          1,
+          1,
+          null
+        ]
+      },
+      "/Users/johnnapier/Turing/mod4/technical_challenges/tea_tracker/spec/models/tea_spec.rb": {
+        "lines": [
+          1,
+          null,
+          1,
+          1,
+          2,
+          null,
+          null,
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          null,
+          null
+        ]
+      },
+      "/Users/johnnapier/Turing/mod4/technical_challenges/tea_tracker/app/models/tea.rb": {
+        "lines": [
+          1,
+          1,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1,
+          null
+        ]
       }
     },
-    "timestamp": 1649715705
+    "timestamp": 1649717820
   }
 }
