@@ -4,6 +4,10 @@ class Subscription < ApplicationRecord
                         :status,
                         :frequency
                       
-  has_many :customer_subscriptions
-  has_many :customers, through: :customer_subscriptions 
+  belongs_to :customer
+
+  enum status: {
+    "active" => 0,
+    "cancelled" => 1
+  }
 end
