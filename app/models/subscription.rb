@@ -4,8 +4,7 @@ class Subscription < ApplicationRecord
                         :status,
                         :frequency, 
                         :customer_id
-                        
-                      
+                                            
   belongs_to :customer
 
   enum status: {

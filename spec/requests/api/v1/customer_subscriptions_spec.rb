@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe 'customer subscriptions endpoints' do
+  let!(:customer_1) {Customer.create!(first_name: "Oswald", last_name: "Cobblepot", email: "penguin@gotham.com", address: "936 IceBox Ave.")}
+  let!(:sub_1) {customer_1.subscriptions.create!(title: "legendary", price: 10.00, status: 0, frequency: "High", customer_id: customer_1)}
+  let!(:sub_2) {customer_1.subscriptions.create!(title: "common", price: 5.00, status: 1, frequency: "Medium", customer_id: customer_1)}
+  let!(:tea_1) {Tea.create!(title: "Chamomile", description: "Promotes Sleep", temperature: 100, brew_time: 8)}
+  
   context 'happy paths' do 
     it 'can get all customer subscriptions' do
-      customer_1 = FactoryBot.create(:customer)
-      sub_1 = FactoryBot.create(:subscription, status: 0, customer: customer_1)
-      sub_2 = FactoryBot.create(:subscription, status: 1, customer: customer_1)
-      tea_1 = FactoryBot.create(:tea, subscription: sub_1)
-      tea_2 = FactoryBot.create(:tea, subscription: sub_2)
       
       get "/api/v1/customers/#{customer_1.id}/subscriptions"
       
@@ -30,19 +30,19 @@ RSpec.describe 'customer subscriptions endpoints' do
     end
     
     it 'can create a subscription' do 
-      customer_1 = FactoryBot.create(:customer)
       
       subscription_params = ({
         title: "Legendary", 
         price: 10.00, 
         status: 0,
         frequency: "High",
-        customer_id: customer_1.id
+        customer_id: customer_1.id,
+        tea_id: tea_1.id
         })
         
       headers = {"CONTENT_TYPE" => "application/json"}
       
-      post "/api/v1/subscriptions", headers: headers, params: JSON.generate(subscription: subscription_params)
+      post "/api/v1/subscriptions", headers: headers, params: JSON.generate(subscription_params)
       
       created_subscription = Subscription.last
       
@@ -63,12 +63,12 @@ RSpec.describe 'customer subscriptions endpoints' do
       subscription_params = { status: 1 }
       headers = {"CONTENT_TYPE" => "application/json"}
       
-      patch "/api/v1/subscriptions/#{sub_1.id}", headers: headers, params: JSON.generate({subscription: subscription_params})
+      patch "/api/v1/subscriptions/#{sub_1.id}", headers: headers, params: JSON.generate(subscription_params)
       
       subscription = Subscription.find_by(id: sub_1.id)
       
       expect(response).to be_successful 
-      expect(subscription.status).to_not eq(sub_1.status)
+      expect(subscription.status).to_not eq(previous_status)
       expect(subscription.status).to eq("cancelled")
     end
   end
@@ -82,12 +82,13 @@ RSpec.describe 'customer subscriptions endpoints' do
         price: 10.00, 
         status: 0,
         frequency: "High",
-        customer_id: customer_1.id
+        customer_id: customer_1.id,
+        tea_id: tea_1.id
         })
         
       headers = {"CONTENT_TYPE" => "application/json"}
       
-      post "/api/v1/subscriptions", headers: headers, params: JSON.generate(subscription: subscription_params)
+      post "/api/v1/subscriptions", headers: headers, params: JSON.generate(subscription_params)
       
       expect(response).to_not be_successful 
       expect(response.status).to eq(404)
@@ -100,7 +101,7 @@ RSpec.describe 'customer subscriptions endpoints' do
       subscription_params = { status: nil }
       headers = {"CONTENT_TYPE" => "application/json"}
       
-      patch "/api/v1/subscriptions/#{sub_1.id}", headers: headers, params: JSON.generate({subscription: subscription_params})
+      patch "/api/v1/subscriptions/#{sub_1.id}", headers: headers, params: JSON.generate(subscription_params)
       
       expect(response).to_not be_successful 
       expect(response.status).to eq(404)
