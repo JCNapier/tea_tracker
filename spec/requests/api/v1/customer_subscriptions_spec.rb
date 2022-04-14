@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'customer subscriptions endpoints' do
-  let!(:customer_1) {Customer.create!(first_name: "Oswald", last_name: "Cobblepot", email: "penguin@gotham.com", address: "936 IceBox Ave.")}
+  let(:customer_1) {Customer.create!(first_name: "Oswald", last_name: "Cobblepot", email: "penguin@gotham.com", address: "936 IceBox Ave.")}
   let!(:sub_1) {customer_1.subscriptions.create!(title: "legendary", price: 10.00, status: 0, frequency: "High", customer_id: customer_1)}
   let!(:sub_2) {customer_1.subscriptions.create!(title: "common", price: 5.00, status: 1, frequency: "Medium", customer_id: customer_1)}
   let!(:tea_1) {Tea.create!(title: "Chamomile", description: "Promotes Sleep", temperature: 100, brew_time: 8)}
@@ -9,7 +9,7 @@ RSpec.describe 'customer subscriptions endpoints' do
   context 'happy paths' do 
     it 'can get all customer subscriptions' do
       
-      get "/api/v1/customers/#{customer_1.id}/subscriptions"
+      get api_v1_customer_subscriptions_path(customer_1)
       
       json = JSON.parse(response.body, symbolize_names: true)
       
@@ -30,19 +30,17 @@ RSpec.describe 'customer subscriptions endpoints' do
     end
     
     it 'can create a subscription' do 
-      
       subscription_params = ({
         title: "Legendary", 
         price: 10.00, 
         status: 0,
         frequency: "High",
-        customer_id: customer_1.id,
         tea_id: tea_1.id
         })
         
       headers = {"CONTENT_TYPE" => "application/json"}
       
-      post "/api/v1/subscriptions", headers: headers, params: JSON.generate(subscription_params)
+      post api_v1_customer_subscriptions_path(customer_1), headers: headers, params: JSON.generate(subscription_params)
       
       created_subscription = Subscription.last
       
@@ -57,51 +55,143 @@ RSpec.describe 'customer subscriptions endpoints' do
     end
     
     it 'can update a subscription' do 
-      customer_1 = FactoryBot.create(:customer)
-      sub_1 = FactoryBot.create(:subscription, status: 0, customer: customer_1)
       previous_status = Subscription.last.status 
-      subscription_params = { status: 1 }
+      
+      subscription_params = { status: 0 }
+      
       headers = {"CONTENT_TYPE" => "application/json"}
       
-      patch "/api/v1/subscriptions/#{sub_1.id}", headers: headers, params: JSON.generate(subscription_params)
+      patch api_v1_customer_subscription_path(customer_1, sub_1), headers: headers, params: JSON.generate(subscription_params)
       
       subscription = Subscription.find_by(id: sub_1.id)
       
       expect(response).to be_successful 
       expect(subscription.status).to_not eq(previous_status)
-      expect(subscription.status).to eq("cancelled")
+      expect(subscription.status).to eq("active")
     end
   end
 
   context 'sad paths' do 
-    it 'returns a 404 if subscription cant be created' do 
-      customer_1 = FactoryBot.create(:customer)
-  
+    it '#create returns a 404 if title is left blank' do 
       subscription_params = ({
         title: nil, 
         price: 10.00, 
         status: 0,
         frequency: "High",
-        customer_id: customer_1.id,
         tea_id: tea_1.id
         })
         
       headers = {"CONTENT_TYPE" => "application/json"}
       
-      post "/api/v1/subscriptions", headers: headers, params: JSON.generate(subscription_params)
+      post api_v1_customer_subscriptions_path(customer_1), headers: headers, params: JSON.generate(subscription_params)
       
       expect(response).to_not be_successful 
       expect(response.status).to eq(404)
     end
 
-    it 'returns a 404 if subscription cant be updated' do 
-      customer_1 = FactoryBot.create(:customer) 
-      sub_1 = FactoryBot.create(:subscription, status: 0, customer: customer_1)
+    it '#create returns a 404 if price is left blank' do 
+      subscription_params = ({
+        title: "Legendary", 
+        price: nil, 
+        status: 0,
+        frequency: "High",
+        tea_id: tea_1.id
+        })
+        
+      headers = {"CONTENT_TYPE" => "application/json"}
       
+      post api_v1_customer_subscriptions_path(customer_1), headers: headers, params: JSON.generate(subscription_params)
+      
+      expect(response).to_not be_successful 
+      expect(response.status).to eq(404)
+    end
+
+    it '#create returns a 404 if status is left blank' do 
+      subscription_params = ({
+        title: "Legendary", 
+        price: 10.00, 
+        status: nil,
+        frequency: "High",
+        tea_id: tea_1.id
+        })
+        
+      headers = {"CONTENT_TYPE" => "application/json"}
+      
+      post api_v1_customer_subscriptions_path(customer_1), headers: headers, params: JSON.generate(subscription_params)
+      
+      expect(response).to_not be_successful 
+      expect(response.status).to eq(404)
+    end
+
+    it '#create returns a 404 if frequency is left blank' do 
+      subscription_params = ({
+        title: "Legendary", 
+        price: 10.00, 
+        status: 0,
+        frequency: nil,
+        tea_id: tea_1.id
+        })
+        
+      headers = {"CONTENT_TYPE" => "application/json"}
+      
+      post api_v1_customer_subscriptions_path(customer_1), headers: headers, params: JSON.generate(subscription_params)
+      
+      expect(response).to_not be_successful 
+      expect(response.status).to eq(404)
+    end
+
+    it '#create returns a 404 if tea_id is left blank' do 
+      subscription_params = ({
+        title: "Legendary", 
+        price: 10.00, 
+        status: 0,
+        frequency: "high",
+        tea_id: nil
+        })
+        
+      headers = {"CONTENT_TYPE" => "application/json"}
+      
+      post api_v1_customer_subscriptions_path(customer_1), headers: headers, params: JSON.generate(subscription_params)
+      
+      expect(response).to_not be_successful 
+      expect(response.status).to eq(404)
+    end
+
+    it '#update returns a 404 if title is nil' do 
+      subscription_params = { title: nil }
+      headers = {"CONTENT_TYPE" => "application/json"}
+      
+      patch api_v1_customer_subscription_path(customer_1.id, sub_1.id), headers: headers, params: JSON.generate(subscription_params)
+      
+      expect(response).to_not be_successful 
+      expect(response.status).to eq(404)
+    end
+
+    it '#update returns a 404 if price is nil' do 
+      subscription_params = { price: nil }
+      headers = {"CONTENT_TYPE" => "application/json"}
+      
+      patch api_v1_customer_subscription_path(customer_1.id, sub_1.id), headers: headers, params: JSON.generate(subscription_params)
+      
+      expect(response).to_not be_successful 
+      expect(response.status).to eq(404)
+    end
+    
+    it '#update returns a 404 if status is nil' do 
       subscription_params = { status: nil }
       headers = {"CONTENT_TYPE" => "application/json"}
       
-      patch "/api/v1/subscriptions/#{sub_1.id}", headers: headers, params: JSON.generate(subscription_params)
+      patch api_v1_customer_subscription_path(customer_1.id, sub_1.id), headers: headers, params: JSON.generate(subscription_params)
+      
+      expect(response).to_not be_successful 
+      expect(response.status).to eq(404)
+    end
+
+    it '#update returns a 404 if frequency is nil' do 
+      subscription_params = { frequency: nil }
+      headers = {"CONTENT_TYPE" => "application/json"}
+      
+      patch api_v1_customer_subscription_path(customer_1.id, sub_1.id), headers: headers, params: JSON.generate(subscription_params)
       
       expect(response).to_not be_successful 
       expect(response.status).to eq(404)
