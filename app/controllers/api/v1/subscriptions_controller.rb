@@ -1,6 +1,5 @@
 class Api::V1::SubscriptionsController < ApplicationController 
   def create
-    # customer = Customer.find(subscription_params[:customer_id])
     tea = Tea.find(tea_params[:tea_id])
     subscription = Subscription.create(subscription_params)
     TeaSubscription.create(subscription_id: subscription.id, tea_id: tea.id)
