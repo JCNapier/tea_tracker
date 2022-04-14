@@ -1,10 +1,15 @@
 class Api::V1::SubscriptionsController < ApplicationController 
+  def index 
+    render(json: SubscriptionSerializer.new(Subscription.where(customer_id: params[:customer_id])))
+  end
+
   def create
-    tea = Tea.find(tea_params[:tea_id])
     subscription = Subscription.create(subscription_params)
-    TeaSubscription.create(subscription_id: subscription.id, tea_id: tea.id)
-    
-    if subscription.save 
+
+    if subscription.save && tea_params[:tea_id].present?
+      tea = Tea.find(tea_params[:tea_id])
+      TeaSubscription.create!(subscription_id: subscription.id, tea_id: tea.id)
+
       render(json: SubscriptionSerializer.new(Subscription.create(subscription_params)), status: 201)
     else 
       render :status => 404
@@ -12,9 +17,9 @@ class Api::V1::SubscriptionsController < ApplicationController
   end
 
   def update
-    subscription = Subscription.update(params[:subscription_id], subscription_params)
+    subscription = Subscription.update(params[:id], subscription_params)
     if subscription.save 
-      render(json: SubscriptionSerializer.new(Subscription.update(params[:subscription_id], subscription_params)))
+      render(json: SubscriptionSerializer.new(Subscription.update(params[:id], subscription_params)))
     else  
       render :status => 404
     end
