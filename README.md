@@ -8,7 +8,7 @@
 
 ## Description 
 
-Tea Tracker is a small BE API creating three endpoints for creating, updating, and returning Customer Subscriptions and the Tea's on those subscriptions. In this application, customers have a _1 to Many_ relationship with subscriptins, and subscriptions have a _Many to Many_ relationship with Teas. There is full test suite for all end points have happy path, sad path, and edge case testing. 
+Tea Tracker is a small BE API creating three endpoints for creating, updating, and returning Customer Tea Subscriptions. In this application, customers have a _1 to Many_ relationship with subscriptins, and subscriptions have a _Many to Many_ relationship with Teas. There is full test suite for all end points have happy path, sad path, and edge case testing. 
 
 ## Versions
 - Ruby 2.7.2
